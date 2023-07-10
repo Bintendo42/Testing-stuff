@@ -27,61 +27,6 @@
               :bounds (static-spherem 0 0 0 4)
               )
 
-;; (defun spawn-village1-oracle-right-eye ()
-;;         (if (handle->process (-> (the-as oracle (process-by-ename "oracle-1")) right-eye-cell))
-;;         (begin
-;;         (birth-pickup-at-point (new 'static 'vector :x (meters 88.30) :y (meters 24.80) :z (meters 16.40) :w 1.0) (pickup-type fuel-cell) (the float (game-task village1-oracle-money1)) #f *entity-pool* (the-as fact-info #f))
-;;         (deactivate (handle->process (-> (the-as oracle (process-by-ename "oracle-1")) right-eye-cell)))
-;;         )
-;;         )
-;;         (none)
-;;         )
-;; (defun spawn-village1-oracle-left-eye ()
-;;         (if (handle->process (-> (the-as oracle (process-by-ename "oracle-1")) left-eye-cell))
-;;         (begin
-;;         (birth-pickup-at-point (new 'static 'vector :x (meters 86.35) :y (meters 25.05) :z (meters 18.4) :w 1.0) (pickup-type fuel-cell) (the float (game-task village1-oracle-money2)) #f *entity-pool* (the-as fact-info #f))
-;;         (deactivate (handle->process (-> (the-as oracle (process-by-ename "oracle-1")) left-eye-cell)))
-;;         )
-;;         )
-;;         (none)
-;;         )
-;; (defun spawn-village2-oracle-right-eye ()
-;;         (if (handle->process (-> (the-as oracle (process-by-ename "oracle-2")) right-eye-cell))
-;;         (begin
-;;         (birth-pickup-at-point (new 'static 'vector :x (meters 243.39) :y (meters 17.77) :z (meters -1529.81) :w 1.0) (pickup-type fuel-cell) (the float (game-task village2-oracle-money1)) #f *entity-pool* (the-as fact-info #f))
-;;         (deactivate (handle->process (-> (the-as oracle (process-by-ename "oracle-2")) right-eye-cell)))
-;;         )
-;;         )
-;;         (none)
-;;         )
-;; (defun spawn-village2-oracle-left-eye ()
-;;         (if (handle->process (-> (the-as oracle (process-by-ename "oracle-2")) left-eye-cell))
-;;         (begin
-;;         (birth-pickup-at-point (new 'static 'vector :x (meters 242.40) :y (meters 16.76) :z (meters -1527.40) :w 1.0) (pickup-type fuel-cell) (the float (game-task village2-oracle-money2)) #f *entity-pool* (the-as fact-info #f))
-;;         (deactivate (handle->process (-> (the-as oracle (process-by-ename "oracle-2")) left-eye-cell)))
-;;         )
-;;         )
-;;         (none)
-;;         )
-;; (defun spawn-village3-oracle-right-eye ()
-;;         (if (handle->process (-> (the-as oracle (process-by-ename "oracle-3")) right-eye-cell))
-;;         (begin
-;;         (birth-pickup-at-point (new 'static 'vector :x (meters 1017.76) :y (meters 45.35) :z (meters -3505.89) :w 1.0) (pickup-type fuel-cell) (the float (game-task village3-oracle-money1)) #f *entity-pool* (the-as fact-info #f))
-;;         (deactivate (handle->process (-> (the-as oracle (process-by-ename "oracle-3")) right-eye-cell)))
-;;         )
-;;         )
-;;         (none)
-;;         )
-;; (defun spawn-village3-oracle-left-eye ()
-;;         (if (handle->process (-> (the-as oracle (process-by-ename "oracle-3")) left-eye-cell))
-;;         (begin
-;;         (birth-pickup-at-point (new 'static 'vector :x (meters 1018.78) :y (meters 45.76) :z (meters -3508.56) :w 1.0) (pickup-type fuel-cell) (the float (game-task village3-oracle-money2)) #f *entity-pool* (the-as fact-info #f))
-;;         (deactivate (handle->process (-> (the-as oracle (process-by-ename "oracle-3")) left-eye-cell)))
-;;         )
-;;         )
-;;         (none)
-;;         )
-
 (defmethod play-anim! oracle ((obj oracle) (arg0 symbol))
   (set! (-> obj talk-message) (text-id press-to-talk))
   (case (current-status (-> obj tasks))
@@ -92,13 +37,9 @@
        )
      (case (-> (level-get-target-inside *level*) name)
        (('village1)
-      ;;  (spawn-village1-oracle-right-eye)
-      ;;  (spawn-village1-oracle-left-eye)
-       (new 'static 'spool-anim :name "oracle-intro-1" :index 9 :parts 5 :command-list '())
+        (new 'static 'spool-anim :name "oracle-intro-1" :index 9 :parts 5 :command-list '())
         )
        (('village2)
-      ;;  (spawn-village2-oracle-right-eye)
-      ;;  (spawn-village2-oracle-left-eye)
         (new 'static 'spool-anim
           :name "oracle-intro-2"
           :index 11
@@ -189,8 +130,6 @@
           )
         )
        (('village3)
-      ;;  (spawn-village3-oracle-right-eye)
-      ;;  (spawn-village3-oracle-left-eye)
         (new 'static 'spool-anim :name "oracle-intro-3" :index 13 :parts 4 :command-list '())
         )
        )
@@ -329,13 +268,23 @@
                 (none)
                 )
               )
+        (fax (new 'static 'fact-info :options (fact-options skip-jump-anim)))
         )
     (ja-post)
     (when (not (task-closed? (the-as game-task (-> obj first-task)) (task-status need-resolution)))
       (vector<-cspace! s4-0 (-> obj node-list data 5))
       (set! (-> obj right-eye-cell)
-            (ppointer->handle (manipy-spawn s4-0 (-> obj entity) *fuel-cell-sg* (new 'static 'vector :w 4915.2) :to obj))
+        (ppointer->handle
+          (birth-pickup-at-point
+            s4-0
+            (pickup-type fuel-cell)
+            (the float (the-as int (-> obj first-task)))
+            #f
+            obj
+            fax
             )
+          )
+        )
       (send-event
         (handle->process (-> obj right-eye-cell))
         'eval
@@ -350,8 +299,17 @@
     (when (not (task-closed? (the-as game-task (-> obj second-task)) (task-status need-resolution)))
       (vector<-cspace! s4-0 (-> obj node-list data 6))
       (set! (-> obj left-eye-cell)
-            (ppointer->handle (manipy-spawn s4-0 (-> obj entity) *fuel-cell-sg* (new 'static 'vector :w 4915.2) :to obj))
+        (ppointer->handle
+          (birth-pickup-at-point
+            s4-0
+            (pickup-type fuel-cell)
+            (the float (the-as int (-> obj second-task)))
+            #f
+            obj
+            fax
             )
+          )
+        )
       (send-event
         (handle->process (-> obj left-eye-cell))
         'eval
