@@ -212,7 +212,7 @@
                         (deg-diff (y-angle gp-1) (vector-y-angle (vector-! (new 'stack-no-clear 'vector) s4-0 (-> gp-1 trans))))
                         )
                       )
-                   (go pelican-explode #f)
+                   (go pelican-explode #f) ;;  (go pelican-spit)
                    )
                )
              )
@@ -288,7 +288,7 @@
       )
     (when (and (and *target* 
                     (>= 81920.0 (vector-vector-xz-distance (-> self path-vector) (-> *target* control trans)))
-                    (logtest? (-> *target* control status) (cshape-moving-flags onsurf))
+                    (logtest? (-> *target* control status) (cshape-moving-flags onsurf))  ;; target grounded
                     )
                (not (handle->process (-> self cam-tracker)))
                )
