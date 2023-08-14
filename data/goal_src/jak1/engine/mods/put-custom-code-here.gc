@@ -23,7 +23,23 @@
 
     (defun runs-every-frame ()
       ;;(increase-power-cell-by-one) This is a call to increase-power-cell-by-one defined in define-custom-functions-here.gc
+(when (in-bubble-meters? -1185.37 10.80 893.62 2.0)
+   (set-vector! (-> *target* root trans) 0.0 0.0 0.0 1.0)
+   )
 
+(when (and (cpad-hold? 0 l1) (cpad-hold? 0 r1) (cpad-hold? 0 l2) (cpad-hold? 0 r2)
+           (movie?) (-> *art-control* spool-lock) (-> *art-control* active-stream)
+           )
+  (case-str (-> *art-control* active-stream)
+    (("fuel-cell-victory" "fuel-cell-victory-2" "fuel-cell-victory-3" "fuel-cell-victory-4" "fuel-cell-victory-5" "fuel-cell-victory-6" "fuel-cell-victory-7" "fuel-cell-victory-8" "fuel-cell-racer-victory-1" "fuel-cell-flut-victory-1")
+      ;; nothing, don't allow exiting cell cutscenes
+      )
+    (else
+      ;; unlock jak during cutscene
+      (process-release? *target*)
+      )
+    )
+  )
       (none)
       )
 

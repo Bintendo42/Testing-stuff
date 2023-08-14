@@ -1448,7 +1448,7 @@
                (and (logtest? (-> self flags) (collectable-flags can-collect))
                     (>= (- (-> *display* base-frame-counter) (-> self birth-time)) (-> self collect-timeout))
                     (and (not (handle->process (-> *game-info* other-camera-handle)))
-                         (not *progress-process*)
+                        ;; (not *progress-process*)
                          (!= (-> self next-state name) 'pickup)
                          *target*
                          (zero? (logand (-> *target* state-flags) (state-flags grabbed dying)))
@@ -1609,7 +1609,8 @@
     (logclear! (-> self draw status) (draw-status hidden))
     (process-entity-status! self (entity-perm-status dead) #t)
     (stop! (-> self sound))
-    (while (handle->process (-> *game-info* other-camera-handle))
+    (when (not *progress-process*)
+     (while (handle->process (-> *game-info* other-camera-handle))
       (format
         #t
         "WARNING: fuel-cell stall ~D ~A ~A~%"
@@ -1666,6 +1667,7 @@
         )
       )
     (spool-push *art-control* (-> self victory-anim name) 0 self (the-as float -99.0))
+    )
     (send-event *target* 'get-pickup (-> self fact pickup-type) (-> self fact pickup-amount))
     (set! (-> self draw bounds w) 32768.0)
     (logior! (-> self skel status) (janim-status inited))
@@ -1675,12 +1677,14 @@
     (add-setting! 'ambient-volume 'rel (-> *setting-control* current ambient-volume-movie) 0)
     (process-spawn othercam self 10 #f #t :to self)
     (auto-save-command 'auto-save 0 0 *default-pool*)
+  (if (not *progress-process*) 
     (ja-play-spooled-anim
       (-> self victory-anim)
       (the-as art-joint-anim (-> self draw art-group data 2))
       (the-as art-joint-anim #f)
       (the-as (function process-drawable symbol) false-func)
       )
+    )
     (remove-setting! 'music-volume)
     (remove-setting! 'sfx-volume)
     (remove-setting! 'ambient-volume)
@@ -1688,7 +1692,7 @@
     (send-event *target* 'end-mode)
     (send-event *camera* 'no-intro)
     (send-event *camera* 'clear-entity)
-    (ja-channel-set! 0)
+    (ja-channel-set! 0) 
     (suspend)
     (suspend)
     (process-spawn-function
@@ -2019,6 +2023,20 @@
   (none)
   )
 
+(defmacro set-vector-meters! (dst x y z)
+  `(set-vector! ,dst (meters ,x) (meters ,y) (meters ,z) (-> ,dst w))
+  )
+
+(defun mod-override-child-fuel-cell-movie-pos ((dst vector) (obj fuel-cell) (maybe-parent process))
+  (case (-> (ppointer->process (-> obj parent)) name) :comp name=
+    (('billy-2)
+      (set-vector-meters! dst 596.80 2.17 -2026.90)
+      (set-vector-meters! (res-lump-struct (-> obj entity) 'movie-pos (vector) :time (the-as float -1000000000.0)) 596.80 2.17 -2026.90)
+      )
+    )
+  (none)
+  )
+
 (defbehavior fuel-cell-init-by-other fuel-cell ((arg0 vector) (arg1 vector) (arg2 fact-info) (arg3 entity-actor))
   (let ((s3-0 (-> arg2 pickup-type))
         (f30-0 (-> arg2 pickup-spawn-amount))
@@ -2039,7 +2057,9 @@
   (initialize-params self 0 (the-as float 1024.0))
   (logclear! (-> self fact options) (fact-options can-collect))
   (update-transforms! (-> self root-override))
+
   (let ((gp-1 (res-lump-struct (-> self entity) 'movie-pos structure :time (the-as float -1000000000.0))))
+    (mod-override-child-fuel-cell-movie-pos (the-as vector gp-1) self (-> arg3 extra process))
     (cond
       ((and *debug-segment* (< (-> *fuel-cell-tune-pos* w) 1000000000.0))
        (set! (-> self jump-pos quad) (-> *fuel-cell-tune-pos* quad))

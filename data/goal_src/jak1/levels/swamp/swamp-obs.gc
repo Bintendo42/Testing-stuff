@@ -682,6 +682,7 @@
   )
 
 (defbehavior swamp-rock-init-by-other swamp-rock ((arg0 vector))
+;; (birth-pickup-at-point (trans-by-ename "swamp-tetherrock-15") (pickup-type fuel-cell) 41.0 #f *target* (the-as fact-info #f))
   (set! (-> self mask) (logior (process-mask attackable) (-> self mask)))
   (let ((s5-0 (new 'process 'collide-shape-moving self (collide-list-enum usually-hit-by-player))))
     (set! (-> s5-0 dynam) (copy *standard-dynamics* 'process))
