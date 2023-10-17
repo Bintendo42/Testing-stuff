@@ -17,19 +17,19 @@
 
 (defun choose-next-phase ()
   (let ((next-phase (cond 
-                      ((<= *robotboss-hp* 0)
+                      ((<= *robotboss-hp* 0)  ;; <= 0 HP
                         robotboss-white-eco-movie
                         )
-                      ((<= *robotboss-hp* *robotboss-hp-per-phase*)
+                      ((<= *robotboss-hp* *robotboss-hp-per-phase*) ;; <= 6 HP
                         robotboss-yellow
                         )
-                      ((<= *robotboss-hp* (* 2 *robotboss-hp-per-phase*))
+                      ((<= *robotboss-hp* (* 2 *robotboss-hp-per-phase*)) ;; <= 12 HP
                         robotboss-red
                         )
-                      ((<= *robotboss-hp* (* 3 *robotboss-hp-per-phase*))
+                      ((<= *robotboss-hp* (* 3 *robotboss-hp-per-phase*)) ;; <= 18 HP
                         robotboss-green
                         )
-                      (else ;; (<= *robotboss-hp* (* 4 *robotboss-hp-per-phase*))
+                      (else ;; (<= *robotboss-hp* (* 4 *robotboss-hp-per-phase*)) ;; <= 24 HP
                         robotboss-blue-wait
                         )
                       )))
@@ -1040,7 +1040,7 @@
     (cond
       ((or (and (<= *robotboss-hp* 0) (>= (-> self hits-to-go) 0))
           (and (zero? (-> self hits-to-go)) 
-               (< (+ (-> self state-time) *robotboss-phase-timeout*) (-> *display* base-frame-counter))
+               (< (+ (-> self state-time) *robotboss-phase-timeout*) (current-time))
                )
           )
        (set! (-> self keep-charging) #f)
@@ -1632,7 +1632,7 @@
     (cond
       ((or (and (<= *robotboss-hp* 0) (>= (-> self hits-to-go) 0))
           (and (zero? (-> self hits-to-go)) 
-               (< (+ (-> self state-time) *robotboss-phase-timeout*) (-> *display* base-frame-counter))
+               (< (+ (-> self state-time) *robotboss-phase-timeout*) (current-time))
                )
           )
        (robotboss-yellow-eco-off)
@@ -2626,7 +2626,7 @@
     (cond
       ((or (and (<= *robotboss-hp* 0) (>= (-> self hits-to-go) 0))
           (and (zero? (-> self hits-to-go)) 
-               (< (+ (-> self state-time) *robotboss-phase-timeout*) (-> *display* base-frame-counter))
+               (< (+ (-> self state-time) *robotboss-phase-timeout*) (current-time))
                )
           )
        (format 0 "ayo 1~%")
@@ -2723,7 +2723,7 @@
         )
       (when (or (and (<= *robotboss-hp* 0) (>= (-> self hits-to-go) 0))
           (and (<= (-> self hits-to-go) 0) 
-               (< (+ (-> self state-time) *robotboss-phase-timeout*) (-> *display* base-frame-counter))
+               (< (+ (-> self state-time) *robotboss-phase-timeout*) (current-time))
                )
           )
         (let ((a1-6 (new 'stack-no-clear 'event-message-block)))
