@@ -500,8 +500,10 @@
       (send-event *camera* 'clear-entity)
       (camera-change-to (the-as string 'base) 60 #f)
       )
-    ;; shift jak backwards slightly on unzoom, if stick is neutral
-    (when (zero? (-> *cpad-list* cpads 0 stick0-speed))
+    ;; shift jak backwards slightly on unzoom, if jak is on some surface and stick is neutral
+    (when (and (logtest? (-> *target* control status) (cshape-moving-flags onsurf))
+               (zero? (-> *cpad-list* cpads 0 stick0-speed))
+               )
       (let* ((camera-quat (new-stack-quaternion0))
              (camera-z-vector (new-stack-vector0)))
         ;; convert the camera angle from a matrix to a quaternion (???)
