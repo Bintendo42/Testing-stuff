@@ -589,7 +589,7 @@
       (let ((state-ticks (- (current-time) (-> self state-time))))
         ;; finalboss warp if in geyser and user presses triangle within ~ 5-frame (@ 60fps) window
         (when (and (< 25 state-ticks)
-                   (<= state-ticks 50)
+                   (<= state-ticks 30)
                    (cpad-pressed? 0 triangle)
                    (= (level-status *level* 'training) 'active))
           (set-continue! *game-info* "finalboss-start")
