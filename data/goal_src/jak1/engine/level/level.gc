@@ -1051,8 +1051,18 @@
 ;; method 27 level
 
 ;; method 10 level
-(defmethod is-object-visible? level ((obj level) (arg0 int))
+(defmethod is-object-visible? level ((obj level) (arg0 int) (arg1 entity))
   "Is arg0 visible? Note that this will return #f if the visibility data is not loaded."
+
+  ;; always spawn sage-finalboss so we can do credits warp
+  (cond
+    ((= (-> (the entity-actor arg1) etype symbol) 'sage-finalboss)
+      (return #t)
+      )
+    (else
+      ;; (format 0 "non sage-finalboss ~A~%" (-> (the entity-actor arg1) etype symbol))
+      )
+    )
 
   ;; note : pc port added option to show every actor regardless
   (with-pc (if (-> *pc-settings* force-actors?) (return #t)))

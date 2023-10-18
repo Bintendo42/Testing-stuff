@@ -373,7 +373,7 @@
                                      (bucket-id debug-no-zbuf))
   (let* ((boss (the process-drawable (process-by-ename "robotboss-3")))
             (boss-ticks (if boss 
-                                  (- (+ (-> boss state-time) *robotboss-phase-timeout*) (-> *display* base-frame-counter))
+                                  (- (+ (-> boss state-time) *robotboss-phase-timeout*) (current-time))
                                   69
                                   ))
             )
